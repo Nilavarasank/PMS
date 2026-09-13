@@ -13,10 +13,11 @@ function isAllowedOrigin(origin) {
 
   const configured = (process.env.CORS_ORIGIN || 'http://localhost:5173')
     .split(',')
-    .map((value) => value.trim())
+    .map((value) => value.trim().replace(/\/$/, ''))
     .filter(Boolean);
 
   if (configured.includes(origin)) return true;
+  if (/^https:\/\/([a-z0-9-]+\.)*vercel\.app$/i.test(origin)) return true;
 
   const isDev = process.env.NODE_ENV !== 'production';
   return isDev && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
