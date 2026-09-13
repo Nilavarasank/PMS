@@ -1,0 +1,63 @@
+Project Management System — Text ER Diagram
+==========================================
+
+[users]
+  PK  id              UUID
+      full_name       VARCHAR(255)  NOT NULL
+      email           VARCHAR(255)  NOT NULL UNIQUE
+      password_hash   VARCHAR(255)  NOT NULL
+      created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+
+         1
+         |
+         | user_id  ON DELETE CASCADE
+         |
+         N
+[projects]
+  PK  id              UUID
+  FK  user_id         UUID          NOT NULL  -> users.id
+      name            VARCHAR(255)  NOT NULL
+      description     TEXT
+      status          ENUM('Not Started','In Progress','Completed') DEFAULT 'Not Started'
+      start_date      DATE
+      end_date        DATE          (must be >= start_date when both set)
+      created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+
+         1
+         |
+         | project_id  ON DELETE CASCADE
+         |
+         N
+[tasks]
+  PK  id              UUID
+  FK  project_id      UUID          NOT NULL  -> projects.id
+      name            VARCHAR(255)  NOT NULL
+      description     TEXT
+      priority        ENUM('Low','Medium','High')
+      status          ENUM('Pending','In Progress','Completed') DEFAULT 'Pending'
+      due_date        DATE
+      created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+
+Relationships
+-------------
+users 1 ──< projects     (a user owns many projects; deleting a user deletes their projects)
+projects 1 ──< tasks     (a project has many tasks; deleting a project deletes its tasks)
+
+Cardinality is strictly one-to-many. There is no many-to-many join table.
+Ownership of a task is inferred through its parent project (tasks.project_id -> projects.user_id).
+
+ASCII
+-----
+
+  +------------------+          +----------------------+          +------------------+
+  |      users       |          |       projects       |          |      tasks       |
+  +------------------+          +----------------------+          +------------------+
+  | id            PK |------<---| user_id           FK |------<---| project_id    FK |
+  | full_name        |          | id                PK |          | id            PK |
+  | email       UNIQ |          | name                 |          | name             |
+  | password_hash    |          | description          |          | description      |
+  | created_at       |          | status               |          | priority         |
+  +------------------+          | start_date           |          | status           |
+                                | end_date             |          | due_date         |
+                                | created_at           |          | created_at       |
+                                +----------------------+          +------------------+
