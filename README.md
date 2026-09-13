@@ -185,7 +185,11 @@ Auth routes are rate-limited (5 requests / 10 minutes / IP). Full request and re
 | `/projects/:id` | Authenticated |
 | `*` | 404 |
 
-JWT and profile are kept in memory and `localStorage`. A `401` clears the session and returns to `/login`.
+JWT and profile are kept in memory and `localStorage`. Axios sends `Authorization: Bearer <token>` on every API call. A `401` clears the session and returns to `/login`. `/dashboard`, `/projects`, and `/projects/:id` are wrapped in `ProtectedRoute`.
+
+Vite only exposes variables prefixed with `VITE_`. Restart the frontend after changing `frontend/.env`.
+
+`backend/src/app.js` exports `createApp()` so Jest can import the API without listening on a port.
 
 ---
 
@@ -222,7 +226,6 @@ cd frontend && npm run lint && npm run build
 
 Three tables: `users` → `projects` → `tasks` (cascade on delete). Diagrams:
 
-- [ER diagram (PNG)](docs/ER_Diagram.png)
 - [ER diagram (SVG)](docs/ER_Diagram.svg)
 - [Text ER diagram](docs/ER_Diagram.txt)
 - Combined schema: `backend/src/migrations/schema.sql`
@@ -241,12 +244,12 @@ Three tables: `users` → `projects` → `tasks` (cascade on delete). Diagrams:
 
 ## Documentation
 
+This README is the single project guide (setup, scripts, env, architecture, deploy). Extra reference files:
+
 | Doc | Contents |
 |-----|----------|
-| [Setup](docs/SETUP.md) | Environment, Postgres, seed, Docker, deploy notes |
-| [API](docs/API_Documentation.md) | Endpoints, bodies, errors |
-| [Backend](backend/README.md) | API layout and scripts |
-| [Frontend](frontend/README.md) | UI layout and auth flow |
+| [API](docs/API_Documentation.md) | Full request and response shapes |
+| [ER diagram](docs/ER_Diagram.svg) | Database relationships |
 
 ---
 
